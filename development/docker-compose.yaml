@@ -1,0 +1,33 @@
+services:
+  app:
+    image: rust:1.81
+    environment:
+      - RUST_BACKTRACE=1
+      - CARGO_TARGET_DIR=/tmp/target
+      - CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse
+    depends_on:
+      - postgresql
+    tty: true
+    volumes:
+      - ../app:/app
+      - fragile_test_cargo_cache:/usr/local/cargo/registry
+      - fragile_test_target_cache:/tmp/target
+    working_dir: /app
+    security_opt:
+      - seccomp:unconfined
+
+  postgresql:
+    image: postgres:16.4
+    environment:
+      - POSTGRES_DB=web
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=pass
+    ports:
+      - 5432:5432
+    volumes:
+      - fragile_test_postgresql_data:/var/lib/postgresql/data
+
+volumes:
+  fragile_test_cargo_cache:
+  fragile_test_target_cache:
+  fragile_test_postgresql_data:
