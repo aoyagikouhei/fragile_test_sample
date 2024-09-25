@@ -117,7 +117,7 @@ mod tests {
     #[tokio::test]
     async fn test_users_builder1() -> anyhow::Result<()> {
         let conn = setup().await?;
-        Users::make_normal(&conn, &mut UsersBuilder::default().user_email("taro")).await?;
+        Users::make_normal(&conn, &mut UsersBuilder::default().user_name("taro")).await?;
         let list = Users::select_all(&conn).await?;
         assert_eq!(list.len(), 1);
         Ok(())
@@ -127,8 +127,8 @@ mod tests {
     #[tokio::test]
     async fn test_users_builder2() -> anyhow::Result<()> {
         let conn = setup().await?;
-        Users::make_normal(&conn, &mut UsersBuilder::default().user_email("taro")).await?;
-        Users::make_admin(&conn, &mut UsersBuilder::default().user_email("jiro")).await?;
+        Users::make_normal(&conn, &mut UsersBuilder::default().user_name("taro")).await?;
+        Users::make_admin(&conn, &mut UsersBuilder::default().user_name("jiro")).await?;
         let list = Users::select_all(&conn).await?;
         assert_eq!(list.len(), 2);
         Ok(())
