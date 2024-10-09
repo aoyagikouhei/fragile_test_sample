@@ -29,7 +29,15 @@ services:
     volumes:
       - fragile_test_postgresql_data:/var/lib/postgresql/data
 
+  valkey:
+    image: valkey/valkey:8.0.1
+    ports:
+      - 6379:6379
+    volumes:
+      - fragile_test_valkey_data:/data
+
 volumes:
   fragile_test_cargo_cache:
   fragile_test_target_cache:
   fragile_test_postgresql_data:
+  fragile_test_valkey_data:
