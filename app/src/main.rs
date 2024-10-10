@@ -1,4 +1,5 @@
 pub mod postgres;
+pub mod redis;
 
 fn main() {
     println!("Hello, world!");
@@ -9,7 +10,7 @@ mod tests {
     use tokio_postgres::NoTls;
     use uuid::Uuid;
 
-    use crate::postgres::users::{UserKbn, Users, UsersBuilder};
+    use crate::{postgres::users::{UserKbn, Users, UsersBuilder}, redis::contents::Content};
 
     async fn setup() -> anyhow::Result<tokio_postgres::Client> {
         let (client, connection) =
@@ -22,6 +23,11 @@ mod tests {
         });
         Users::delete_all(&client).await?;
         Ok(client)
+    }
+
+    async fn redis_setup() -> anyhow::Result<redis::Connection> {
+        let client = redis::Client::open("redis://valkey/")?;
+        client.get_connection().map_err(Into::into)
     }
 
     // cargo test test_users_columns1 -- --nocapture --test-threads=1
@@ -131,6 +137,30 @@ mod tests {
         Users::make_admin(&conn, &mut UsersBuilder::default().user_name("jiro")).await?;
         let list = Users::select_all(&conn).await?;
         assert_eq!(list.len(), 2);
+        Ok(())
+    }
+
+    // cargo test test_contents -- --nocapture --test-threads=1
+    #[tokio::test]
+    async fn test_contents() -> anyhow::Result<()> {
+        let mut conn = redis_setup().await?;
+        Content::set(
+            &Content {
+                key: "key1".to_owned(),
+                title: "title1".to_owned(),
+                body: "body1".to_owned(),
+            },
+            &mut conn,
+        )?;
+        let content = Content::get(&mut conn, "key1")?;
+        assert_eq!(
+            content,
+            Content {
+                key: "key1".to_owned(),
+                title: "title1".to_owned(),
+                body: "body1".to_owned(),
+            }
+        );
         Ok(())
     }
 }

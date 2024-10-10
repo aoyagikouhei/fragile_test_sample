@@ -15,6 +15,7 @@ postgres-types = { version="0.2", features=[
     "with-serde_json-1",
     "with-uuid-1",
 ] }
+redis = { version = "0.27.4", features = ["tokio-comp", "json"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 strum = { version = "0.26", features = ["derive"] }
